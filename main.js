@@ -21,16 +21,9 @@ app.on('window-all-closed', () => {
 
 const createTray = () => {
   tray = new Tray(path.join(assetsDirectory, '/macos/tray-icon.png'))
-  tray.on('right-click', toggleWindow)
-  tray.on('double-click', toggleWindow)
-  tray.on('click', function (event) {
-    toggleWindow()
-
-    // Show devtools when command clicked
-    if (window.isVisible() && process.defaultApp && event.metaKey) {
-      window.openDevTools({mode: 'detach'})
-    }
-  })
+  tray.on('right-click', toggleWindow);
+  tray.on('double-click', toggleWindow);
+  tray.on('click', toggleWindow);
 }
 
 const getWindowPosition = () => {
@@ -56,7 +49,7 @@ const createWindow = () => {
     frame: false,
     fullscreenable: false,
     resizable: false,
-    transparent: false,
+    transparent: true,
     webPreferences: {
       // Prevents renderer process code from not running when window is
       // hidden
@@ -78,6 +71,7 @@ const createWindow = () => {
 
 const toggleWindow = () => {
   if (window.isVisible()) {
+    tray.setHighlightMode('never');
     window.hide()
   } else {
     showWindow()
@@ -86,8 +80,22 @@ const toggleWindow = () => {
 
 const showWindow = () => {
   const position = getWindowPosition()
+  console.log(position);
   window.setPosition(position.x, position.y, false)
+
+  var js = "  var body = window.document.body; var html = window.document.documentElement; var height = Math.max( body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight );";
+
+  //var contents = window.webContents;
+  //console.log(contents);
+  /*contents.executeJavascript(js, true, (result)=>{
+    "use strict";
+    alert(result);
+
+  });*/
+
+
   window.show()
+  tray.setHighlightMode('always');
   window.focus()
 }
 
