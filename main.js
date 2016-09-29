@@ -38,7 +38,7 @@ app.on('window-all-closed', () => {
 })
 
 const createTray = () => {
-  tray = new Tray(path.join(assetsDirectory, '/macos/tray-icon.png'))
+  tray = new Tray(path.join(assetsDirectory, platform, 'tray-icon.png'))
   tray.on('right-click', toggleWindow);
   tray.on('double-click', toggleWindow);
   tray.on('click', toggleWindow);
@@ -73,19 +73,20 @@ const createWindow = () => {
       // hidden
       backgroundThrottling: false
     }
-  })
+  });
+
   mainWindow.loadURL(`file://${path.join(__dirname, 'index.html')}`)
 
-  mainWindow.webContents.getAllWebContents();
-
   // Open the DevTools.
-  //window.webContents.openDevTools()
+  //mainWindow.webContents.openDevTools()
 
   // Hide the mainWindow when it loses focus
   mainWindow.on('blur', () => {
     if (!mainWindow.webContents.isDevToolsOpened()) {
-      mainWindow.hide()
+      toggleWindow();
+
     }
+
   })
 }
 
@@ -108,10 +109,10 @@ const showWindow = () => {
   //var contents = mainWindow.webContents;
   //console.log(contents);
   /*contents.executeJavascript(js, true, (result)=>{
-    "use strict";
-    alert(result);
+   "use strict";
+   alert(result);
 
-  });*/
+   });*/
 
 
   mainWindow.show()
