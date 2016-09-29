@@ -1,10 +1,28 @@
-const {app, BrowserWindow, ipcMain, Tray} = require('electron')
-const path = require('path')
+const electron = require('electron');
 
-const assetsDirectory = path.join(__dirname, 'assets')
+// Module to control application life.
+const app = electron.app;
+
+// Module to create native browser window.
+const BrowserWindow = electron.BrowserWindow;
+
+// Module for interfacing with the window via ipc
+const ipcMain = electron.ipcMain;
+
+// Module for interfacing with the tray
+const Tray = electron.Tray;
+
+//Get the path
+const path = require('path');
+
+//The path to the assets directory
+const assetsDirectory = path.join(__dirname, 'assets');
+
+//The platform (
+const platform = ( process.platform == 'darwin' ) ? 'macos' : process.platform;
 
 let tray = undefined
-let window = undefined
+let mainWindow = undefined
 
 // Don't show the app in the doc
 app.dock.hide()
@@ -27,7 +45,7 @@ const createTray = () => {
 }
 
 const getWindowPosition = () => {
-  const windowBounds = window.getBounds()
+  const windowBounds = mainWindow.getBounds()
   const trayBounds = tray.getBounds()
 
   // Center window horizontally below the tray icon
@@ -42,7 +60,7 @@ const getWindowPosition = () => {
 }
 
 const createWindow = () => {
-  window = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 300,
     height: 450,
     show: false,
@@ -56,23 +74,25 @@ const createWindow = () => {
       backgroundThrottling: false
     }
   })
-  window.loadURL(`file://${path.join(__dirname, 'index.html')}`)
+  mainWindow.loadURL(`file://${path.join(__dirname, 'index.html')}`)
+
+  mainWindow.webContents.getAllWebContents();
 
   // Open the DevTools.
   //window.webContents.openDevTools()
 
-  // Hide the window when it loses focus
-  window.on('blur', () => {
-    if (!window.webContents.isDevToolsOpened()) {
-      window.hide()
+  // Hide the mainWindow when it loses focus
+  mainWindow.on('blur', () => {
+    if (!mainWindow.webContents.isDevToolsOpened()) {
+      mainWindow.hide()
     }
   })
 }
 
 const toggleWindow = () => {
-  if (window.isVisible()) {
+  if (mainWindow.isVisible()) {
     tray.setHighlightMode('never');
-    window.hide()
+    mainWindow.hide()
   } else {
     showWindow()
   }
@@ -81,11 +101,11 @@ const toggleWindow = () => {
 const showWindow = () => {
   const position = getWindowPosition()
   console.log(position);
-  window.setPosition(position.x, position.y, false)
+  mainWindow.setPosition(position.x, position.y, false)
 
   var js = "  var body = window.document.body; var html = window.document.documentElement; var height = Math.max( body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight );";
 
-  //var contents = window.webContents;
+  //var contents = mainWindow.webContents;
   //console.log(contents);
   /*contents.executeJavascript(js, true, (result)=>{
     "use strict";
@@ -94,9 +114,9 @@ const showWindow = () => {
   });*/
 
 
-  window.show()
+  mainWindow.show()
   tray.setHighlightMode('always');
-  window.focus()
+  mainWindow.focus()
 }
 
 ipcMain.on('show-window', () => {
