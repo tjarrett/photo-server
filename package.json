@@ -16,5 +16,9 @@
   "homepage": "https://bitbucket.org/viapx/photos-server#readme",
   "devDependencies": {
     "electron": "^1.4.1"
+  },
+  "dependencies": {
+    "react": "^15.3.2",
+    "react-dom": "^15.3.2"
   }
 }

@@ -54,7 +54,7 @@ const getWindowPosition = () => {
   // Position window 4 pixels vertically below the tray icon
   //const y = Math.round(trayBounds.y + trayBounds.height)
 
-  return {x: trayBounds.x, y: trayBounds.y};
+  return {x: trayBounds.x-2, y: trayBounds.y};
 
   //return {x: x, y: y}
 }
@@ -77,14 +77,12 @@ const createWindow = () => {
 
   mainWindow.loadURL(`file://${path.join(__dirname, 'index.html')}`)
 
-  // Open the DevTools.
-  //mainWindow.webContents.openDevTools()
-
   // Hide the mainWindow when it loses focus
   mainWindow.on('blur', () => {
+    console.log('blur');
     if (!mainWindow.webContents.isDevToolsOpened()) {
-      toggleWindow();
-
+      tray.setHighlightMode('never');
+      mainWindow.hide();
     }
 
   })
@@ -103,17 +101,6 @@ const showWindow = () => {
   const position = getWindowPosition()
   console.log(position);
   mainWindow.setPosition(position.x, position.y, false)
-
-  var js = "  var body = window.document.body; var html = window.document.documentElement; var height = Math.max( body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight );";
-
-  //var contents = mainWindow.webContents;
-  //console.log(contents);
-  /*contents.executeJavascript(js, true, (result)=>{
-   "use strict";
-   alert(result);
-
-   });*/
-
 
   mainWindow.show()
   tray.setHighlightMode('always');
