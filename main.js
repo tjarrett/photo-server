@@ -1,4 +1,7 @@
+//https://discuss.atom.io/t/electron-app-database-file-structure-code-structure/16491/4
+
 const electron = require('electron');
+const path = require('path');
 
 // Module to control application life.
 const app = electron.app;
@@ -12,24 +15,23 @@ const ipcMain = electron.ipcMain;
 // Module for interfacing with the tray
 const Tray = electron.Tray;
 
-//Get the path
-const path = require('path');
-
 //The path to the assets directory
 const assetsDirectory = path.join(__dirname, 'assets');
 
 //The platform (
 const platform = ( process.platform == 'darwin' ) ? 'macos' : process.platform;
 
-let tray = undefined
-let mainWindow = undefined
+let tray = undefined;
+let mainWindow = undefined;
 
 // Don't show the app in the doc
-app.dock.hide()
+app.dock.hide();
 
 app.on('ready', () => {
-  createTray()
-  createWindow()
+  createTray();
+  createWindow();
+
+
 })
 
 // Quit the app when the window is closed
@@ -45,18 +47,8 @@ const createTray = () => {
 }
 
 const getWindowPosition = () => {
-  const windowBounds = mainWindow.getBounds()
   const trayBounds = tray.getBounds()
-
-  // Center window horizontally below the tray icon
-  //const x = Math.round(trayBounds.x + (trayBounds.width / 2) - (windowBounds.width / 2))
-
-  // Position window 4 pixels vertically below the tray icon
-  //const y = Math.round(trayBounds.y + trayBounds.height)
-
   return {x: trayBounds.x-2, y: trayBounds.y};
-
-  //return {x: x, y: y}
 }
 
 const createWindow = () => {
