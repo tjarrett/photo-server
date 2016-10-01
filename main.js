@@ -3,6 +3,7 @@
 
 const electron = require('electron');
 const path = require('path');
+const nconf = require('nconf');
 
 // Module to control application life.
 const app = electron.app;
