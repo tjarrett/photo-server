@@ -3,7 +3,8 @@
 
 const electron = require('electron');
 const path = require('path');
-const nconf = require('nconf');
+const vpconfig = require('./lib/config.js');
+const scann = require('./app/scanner.js');
 
 // Module to control application life.
 const app = electron.app;

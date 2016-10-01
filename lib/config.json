@@ -1,0 +1,9 @@
+{
+  "dataDir": "~/Library/Application Support/viapx/photos",
+  "photoDirs": [
+    "/Users/tjarrett/Google Drive/viapx/photos/test-photos"
+  ],
+  "couchdb": {
+    "uuid": "2a5c1951-615c-4aee-ba16-91a139c6d0cd"
+  }
+}
