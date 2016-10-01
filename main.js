@@ -34,6 +34,8 @@ app.dock.hide();
 app.on('ready', () => {
   createTray();
   createWindow();
+  launchScanner();
+  launchServer();
 
 
 })
@@ -106,3 +108,14 @@ const showWindow = () => {
 ipcMain.on('show-window', () => {
   showWindow()
 })
+
+const launchScanner = () => {
+  "use strict";
+
+}
+
+const launchServer = () => {
+  "use strict";
+
+}
+
