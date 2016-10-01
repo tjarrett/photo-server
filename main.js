@@ -24,6 +24,8 @@ const platform = ( process.platform == 'darwin' ) ? 'macos' : process.platform;
 let tray = undefined;
 let mainWindow = undefined;
 
+console.log(process.env.NODE_ENV);
+
 // Don't show the app in the doc
 app.dock.hide();
 
