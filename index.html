@@ -55,13 +55,18 @@
         return {data: []};
       },
 
+      handleClick: function() {
+        this.setState({data: data});
+
+      },//end handleClick
+
       //Called when the component is rendered for the first time
       componentDidMount: function() {
         this.setState({data: data});
       },
       render: function() {
         return (
-          <div className="commentBox">
+          <div className="commentBox" onClick={this.handleClick}>
             <h1>Comments</h1>
             <CommentList data={this.state.data} />
             <CommentForm />

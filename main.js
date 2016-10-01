@@ -1,4 +1,5 @@
 //https://discuss.atom.io/t/electron-app-database-file-structure-code-structure/16491/4
+//https://forums.plex.tv/discussion/92837/perfect-video-format-encoding
 
 const electron = require('electron');
 const path = require('path');
