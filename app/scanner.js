@@ -117,6 +117,7 @@ class Monitor extends EventEmitter {
     super();
     this._dirs = dirs;
     this._database = database;
+    this._databaseInterface = new DatabaseInterface(this._database);
     this._chokidar = require('chokidar');
     this._watcher = null;
   }
@@ -133,22 +134,32 @@ class Monitor extends EventEmitter {
         console.log(e);
       }
 
+      let _watcher = this._watcher;
+
       this._watcher.on('ready', () => {
         this._watcher
           .on('add', (path) => {
             console.log(`File ${path} has been added`);
+            this._databaseInterface.addFile(path);
+
           })
           .on('change', (path, stats) => {
             console.log(`File ${path} as been changed ${stats}`);
+            this._databaseInterface.updateFile(path);
           })
           .on('unlink', (path) => {
             console.log(`File ${path} as been removed`);
+            this._databaseInterface.removeFile(path);
           })
           .on('addDir', (path) => {
             console.log(`Directory ${path} as been added`);
+            //_watcher.watch(path);
+            console.log("Now watching " + path);
           })
           .on('unlinkDir', (path) => {
             console.log(`Directory ${path} as been removed`);
+            //_watcher.unwatch(path);
+            console.log("No longer watching " + path);
           });
 
       });
@@ -165,19 +176,34 @@ class Monitor extends EventEmitter {
   }
 }
 
+function ThreadHandleFileSystemChanges()
+{
+  //"use strict";
+  //const vpconfig = require(path.join(__dirname, '..', 'lib', 'config.js'));
+  //postMessage("Data dir is " + vpconfig.get('dataDir'));
+  postMessage("hi");
+  this.onmessage = function(event) {
+    postMessage('Hi ' + event.data);
+    self.close();
+  }
+
+
+
+
+
+}
+
 class DatabaseInterface {
   constructor(database) {
     this._database = database;
   }
 
   addFile(path) {
-    let usePromise = true;
     let promiseResolveReject = {};
     let promise = null;
     let callback = null;
 
     if (arguments.length > 1 && typeof arguments[arguments.length-1] == 'function') {
-      usePromise = false;
       callback = arguments[arguments.length-1];
 
     } else {
@@ -188,23 +214,139 @@ class DatabaseInterface {
 
     }
 
-    //Do the add logic
+    process.nextTick(() => {
+      try {
+        this.addFileSync(path);
+        if (promise) {
+          promiseResolveReject.resolve("Done adding " + path);
+
+        }
+
+        if (callback) {
+          callback(null, "Done adding " + path);
+        }
+
+      } catch (e) {
+        if (promise) {
+          promiseResolveReject.reject({path: path, error: e});
+
+        }
+
+        if (callback) {
+          callback(e, path);
+        }
+
+        console.log(e);
+      }
+    });
 
     return promise;
 
   }
 
   addFileSync(path) {
-
+    console.log("Adding " + path + " to the database");
   }
 
   removeFile(path) {
+    let promiseResolveReject = {};
+    let promise = null;
+    let callback = null;
 
+    if (arguments.length > 1 && typeof arguments[arguments.length-1] == 'function') {
+      callback = arguments[arguments.length-1];
+
+    } else {
+      promiseResolveReject = {};
+      promise = new Promise((resolve, reject) => {
+        promiseResolveReject = {resolve: resolve, reject: reject};
+      });
+
+    }
+
+    process.nextTick(() => {
+      try {
+        this.removeFileSync(path);
+        if (promise) {
+          promiseResolveReject.resolve("Done removing " + path);
+
+        }
+
+        if (callback) {
+          callback(null, "Done removing " + path);
+        }
+
+      } catch (e) {
+        if (promise) {
+          promiseResolveReject.reject({path: path, error: e});
+
+        }
+
+        if (callback) {
+          callback(e, path);
+        }
+
+        console.log(e);
+      }
+    });
+
+    return promise;
+  }
+
+  removeFileSync(path) {
+    console.log("Removing " + path + " from the database.");
   }
 
   updateFile(path) {
+    let promiseResolveReject = {};
+    let promise = null;
+    let callback = null;
+
+    if (arguments.length > 1 && typeof arguments[arguments.length-1] == 'function') {
+      callback = arguments[arguments.length-1];
+
+    } else {
+      promiseResolveReject = {};
+      promise = new Promise((resolve, reject) => {
+        promiseResolveReject = {resolve: resolve, reject: reject};
+      });
+
+    }
+
+    process.nextTick(() => {
+      try {
+        this.updateFileSync(path);
+        if (promise) {
+          promiseResolveReject.resolve("Done updating " + path);
+
+        }
+
+        if (callback) {
+          callback(null, "Done updating " + path);
+        }
+
+      } catch (e) {
+        if (promise) {
+          promiseResolveReject.reject({path: path, error: e});
+
+        }
+
+        if (callback) {
+          callback(e, path);
+        }
+
+        console.log(e);
+      }
+    });
+
+    return promise;
 
   }
+
+  updateFileSync(path) {
+    console.log("Updating " + path + " into the database.");
+  }
+
 }
 
 exports.Scanner = Scanner;
