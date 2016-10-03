@@ -1,10 +1,11 @@
 //https://discuss.atom.io/t/electron-app-database-file-structure-code-structure/16491/4
 //https://forums.plex.tv/discussion/92837/perfect-video-format-encoding
+global.APP_BASE_PATH = __dirname;
 
 const electron = require('electron');
 const path = require('path');
 const vpconfig = require('./lib/config.js');
-const scann = require('./app/scanner.js');
+const scanner = require('./app/scanner.js');
 
 // Module to control application life.
 const app = electron.app;
