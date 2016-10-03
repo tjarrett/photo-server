@@ -7,6 +7,7 @@ const path = require('path');
 const vpconfig = require('./lib/config.js');
 const Scanner = require('./app/scanner.js').Scanner;
 const PouchDB = require('pouchdb');
+const fs = require('fs-extra');
 
 // Module to control application life.
 const app = electron.app;
@@ -29,7 +30,15 @@ const platform = ( process.platform == 'darwin' ) ? 'macos' : process.platform;
 let tray = undefined;
 let mainWindow = undefined;
 
-//Set up the database
+//Make sure the dataDir exists
+try {
+  fs.statSync(vpconfig.get('dataDir'));
+
+} catch (e) {
+  fs.mkdirpSync(vpconfig.get('dataDir'));
+}
+
+//Set up the _database
 const db = new PouchDB('http://localhost:5984/viapx-photos.db');
 const remote = new PouchDB(vpconfig.get('dataDir') + '/viapx-photos.db');
 db.sync(remote, {live: true});
