@@ -104,14 +104,21 @@ class Scanner extends EventEmitter {
 
 }
 
+/**
+ * Class for listening for, and reacting to, file system changes.
+ */
 class Monitor extends EventEmitter {
+  /**
+   * Create a monitor
+   * @param {array} dirs        A string of arrays representing the paths to monitor
+   * @param {PouchDB} database  The pouchdb to update
+   */
   constructor(dirs, database) {
     super();
     this._dirs = dirs;
     this._database = database;
     this._chokidar = require('chokidar');
     this._watcher = null;
-    this._watcherReady = false;
   }
 
   start() {
@@ -127,8 +134,6 @@ class Monitor extends EventEmitter {
       }
 
       this._watcher.on('ready', () => {
-        this._watcherReady = true;
-
         this._watcher
           .on('add', (path) => {
             console.log(`File ${path} has been added`);
@@ -156,8 +161,49 @@ class Monitor extends EventEmitter {
 
   stop() {
     this._watcher.close();
-    this._watcherReady = false;
     this._watcher = null;
+  }
+}
+
+class DatabaseInterface {
+  constructor(database) {
+    this._database = database;
+  }
+
+  addFile(path) {
+    let usePromise = true;
+    let promiseResolveReject = {};
+    let promise = null;
+    let callback = null;
+
+    if (arguments.length > 1 && typeof arguments[arguments.length-1] == 'function') {
+      usePromise = false;
+      callback = arguments[arguments.length-1];
+
+    } else {
+      promiseResolveReject = {};
+      promise = new Promise((resolve, reject) => {
+        promiseResolveReject = {resolve: resolve, reject: reject};
+      });
+
+    }
+
+    //Do the add logic
+
+    return promise;
+
+  }
+
+  addFileSync(path) {
+
+  }
+
+  removeFile(path) {
+
+  }
+
+  updateFile(path) {
+
   }
 }
 
