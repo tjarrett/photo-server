@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "babel-standalone": "^6.15.0",
+    "chokidar": "^1.6.0",
     "nconf": "^0.8.4",
     "pouchdb": "^6.0.6",
     "pouchdb-server": "^1.2.0",
