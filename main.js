@@ -5,7 +5,8 @@ global.APP_BASE_PATH = __dirname;
 const electron = require('electron');
 const path = require('path');
 const vpconfig = require('./lib/config.js');
-const scanner = require('./app/scanner.js');
+const Scanner = require('./app/scanner.js').Scanner;
+const PouchDB = require('pouchdb');
 
 // Module to control application life.
 const app = electron.app;
@@ -28,10 +29,19 @@ const platform = ( process.platform == 'darwin' ) ? 'macos' : process.platform;
 let tray = undefined;
 let mainWindow = undefined;
 
-console.log(process.env.NODE_ENV);
+//Set up the database
+const db = new PouchDB('http://localhost:5984/viapx-photos.db');
+const remote = new PouchDB(vpconfig.get('dataDir') + '/viapx-photos.db');
+db.sync(remote, {live: true});
 
 // Don't show the app in the doc
 app.dock.hide();
+
+//Set up the scanner
+let scanner = new Scanner({
+  dirs: vpconfig.get('photoDirs'),
+  database: db
+});
 
 app.on('ready', () => {
   createTray();
@@ -44,7 +54,8 @@ app.on('ready', () => {
 
 // Quit the app when the window is closed
 app.on('window-all-closed', () => {
-  app.quit()
+  scanner.stopMonitor();
+  app.quit();
 })
 
 const createTray = () => {
@@ -113,6 +124,8 @@ ipcMain.on('show-window', () => {
 
 const launchScanner = () => {
   "use strict";
+
+  scanner.startMonitor();
 
 }
 
