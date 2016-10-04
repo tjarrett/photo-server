@@ -4,6 +4,13 @@ const APP_BASE_PATH = global.APP_BASE_PATH;
 
 const path = require('path');
 const vpconfig = require(path.join(APP_BASE_PATH, 'lib', 'config.js'));
+const databaseInterface = require(path.resolve(vpconfig.get('databaseInterfaceSourcePath')));
+
+let databaseInterfaceNameClass = databaseInterface[vpconfig.get('databaseInterface')];
+
+
+
+
 //const PouchDB = require('pouchdb');
 
 //const db = new PouchDB('http://localhost:5984/viapx-photos.db');
@@ -37,7 +44,7 @@ class Scanner extends EventEmitter {
    * Start monitoring the file system for changes
    */
   startMonitor() {
-    this._monitor = new Monitor(this._dirs, this._database);
+    this._monitor = new Monitor(this._dirs, this._database, databaseInterfaceNameClass);
     this._monitor.start();
 
   }
@@ -110,14 +117,15 @@ class Scanner extends EventEmitter {
 class Monitor extends EventEmitter {
   /**
    * Create a monitor
-   * @param {array} dirs        A string of arrays representing the paths to monitor
-   * @param {PouchDB} database  The pouchdb to update
+   * @param {array} dirs                   A string of arrays representing the paths to monitor
+   * @param {PouchDB} database             The pouchdb to update
+   * @param {function} databaseInterface
    */
-  constructor(dirs, database) {
+  constructor(dirs, database, databaseInterface) {
     super();
     this._dirs = dirs;
     this._database = database;
-    this._databaseInterface = new DatabaseInterface(this._database);
+    this._databaseInterface = new databaseInterfaceNameClass(this._database);
     this._chokidar = require('chokidar');
     this._watcher = null;
   }
@@ -176,177 +184,6 @@ class Monitor extends EventEmitter {
   }
 }
 
-function ThreadHandleFileSystemChanges()
-{
-  //"use strict";
-  //const vpconfig = require(path.join(__dirname, '..', 'lib', 'config.js'));
-  //postMessage("Data dir is " + vpconfig.get('dataDir'));
-  postMessage("hi");
-  this.onmessage = function(event) {
-    postMessage('Hi ' + event.data);
-    self.close();
-  }
 
-
-
-
-
-}
-
-class DatabaseInterface {
-  constructor(database) {
-    this._database = database;
-  }
-
-  addFile(path) {
-    let promiseResolveReject = {};
-    let promise = null;
-    let callback = null;
-
-    if (arguments.length > 1 && typeof arguments[arguments.length-1] == 'function') {
-      callback = arguments[arguments.length-1];
-
-    } else {
-      promiseResolveReject = {};
-      promise = new Promise((resolve, reject) => {
-        promiseResolveReject = {resolve: resolve, reject: reject};
-      });
-
-    }
-
-    process.nextTick(() => {
-      try {
-        this.addFileSync(path);
-        if (promise) {
-          promiseResolveReject.resolve("Done adding " + path);
-
-        }
-
-        if (callback) {
-          callback(null, "Done adding " + path);
-        }
-
-      } catch (e) {
-        if (promise) {
-          promiseResolveReject.reject({path: path, error: e});
-
-        }
-
-        if (callback) {
-          callback(e, path);
-        }
-
-        console.log(e);
-      }
-    });
-
-    return promise;
-
-  }
-
-  addFileSync(path) {
-    console.log("Adding " + path + " to the database");
-  }
-
-  removeFile(path) {
-    let promiseResolveReject = {};
-    let promise = null;
-    let callback = null;
-
-    if (arguments.length > 1 && typeof arguments[arguments.length-1] == 'function') {
-      callback = arguments[arguments.length-1];
-
-    } else {
-      promiseResolveReject = {};
-      promise = new Promise((resolve, reject) => {
-        promiseResolveReject = {resolve: resolve, reject: reject};
-      });
-
-    }
-
-    process.nextTick(() => {
-      try {
-        this.removeFileSync(path);
-        if (promise) {
-          promiseResolveReject.resolve("Done removing " + path);
-
-        }
-
-        if (callback) {
-          callback(null, "Done removing " + path);
-        }
-
-      } catch (e) {
-        if (promise) {
-          promiseResolveReject.reject({path: path, error: e});
-
-        }
-
-        if (callback) {
-          callback(e, path);
-        }
-
-        console.log(e);
-      }
-    });
-
-    return promise;
-  }
-
-  removeFileSync(path) {
-    console.log("Removing " + path + " from the database.");
-  }
-
-  updateFile(path) {
-    let promiseResolveReject = {};
-    let promise = null;
-    let callback = null;
-
-    if (arguments.length > 1 && typeof arguments[arguments.length-1] == 'function') {
-      callback = arguments[arguments.length-1];
-
-    } else {
-      promiseResolveReject = {};
-      promise = new Promise((resolve, reject) => {
-        promiseResolveReject = {resolve: resolve, reject: reject};
-      });
-
-    }
-
-    process.nextTick(() => {
-      try {
-        this.updateFileSync(path);
-        if (promise) {
-          promiseResolveReject.resolve("Done updating " + path);
-
-        }
-
-        if (callback) {
-          callback(null, "Done updating " + path);
-        }
-
-      } catch (e) {
-        if (promise) {
-          promiseResolveReject.reject({path: path, error: e});
-
-        }
-
-        if (callback) {
-          callback(e, path);
-        }
-
-        console.log(e);
-      }
-    });
-
-    return promise;
-
-  }
-
-  updateFileSync(path) {
-    console.log("Updating " + path + " into the database.");
-  }
-
-}
 
 exports.Scanner = Scanner;

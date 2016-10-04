@@ -11,5 +11,7 @@
   ],
   "couchdb": {
     "uuid": "2a5c1951-615c-4aee-ba16-91a139c6d0cd"
-  }
+  },
+  "databaseInterface": "DatabaseInterfaceNodeTick",
+  "databaseInterfaceSourcePath": "app/database-interface.js"
 }
