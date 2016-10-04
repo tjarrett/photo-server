@@ -1,7 +1,8 @@
 {
   "dataDir": "~/Library/Application Support/viapx/photos",
   "photoDirs": [
-    "/Users/tjarrett/Google Drive/viapx/photos/test-photos"
+    "/Users/tjarrett/Google Drive/viapx/photos/test-photos",
+    "/Users/tjarrett/Google Drive/viapx/photos/test-photos2"
   ],
   "ignoredFiles": [
     "\\.DS_Store$"

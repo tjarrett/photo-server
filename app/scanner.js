@@ -34,6 +34,8 @@ class Scanner extends EventEmitter {
     this._monitor = null;
 
     this._isScanning = false;
+    this._walker = null;
+
     this._isValidating = false;
   }
 
@@ -66,6 +68,48 @@ class Scanner extends EventEmitter {
    * the file system. This takes awhile to run (obviously).
    */
   startFileSystemScan() {
+    let dirs = vpconfig.get('photoDirs');
+    let currDir = dirs.shift();
+    let dbi = new databaseInterfaceClassName(this._database);
+
+    let exif = require('fast-exif');
+
+    this._walker = require('walk').walk(currDir);
+    this._isScanning = true;
+
+    let fileHandler = (root, stat, next) => {
+      console.log("root", root, "stat", stat);
+      console.log(root + '/' + stat.name);
+
+      dbi.addFileSync(root + '/' + stat.name);
+
+      if (this._isScanning) {
+        next();
+      }
+
+    };
+
+    let endHandler = () => {
+      if (dirs.length > 0) {
+        console.log("Finished with " + currDir);
+        currDir = dirs.shift();
+        this._walker = require('walk').walk(currDir);
+        this._walker.on('file', fileHandler);
+        this._walker.on('end', endHandler);
+
+      } else {
+        console.log("No  more directories to parse");
+        this._isScanning = false;
+        this._walker = null;
+
+      }
+
+    }
+
+    this._walker.on('file', fileHandler);
+
+    this._walker.on('end', endHandler);
+
 
   }
 
@@ -73,6 +117,8 @@ class Scanner extends EventEmitter {
    * Stop (or pause) the current file system scan.
    */
   stopFileSystemScan() {
+    this._isScanning = false;
+    this._walker = null;
 
   }
 

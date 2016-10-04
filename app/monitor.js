@@ -34,32 +34,17 @@ class Monitor extends EventEmitter {
         console.log(e);
       }
 
-      let _watcher = this._watcher;
-
       this._watcher.on('ready', () => {
         this._watcher
           .on('add', (path) => {
-            console.log(`File ${path} has been added`);
             this._databaseInterface.addFile(path);
 
           })
           .on('change', (path, stats) => {
-            console.log(`File ${path} as been changed ${stats}`);
             this._databaseInterface.updateFile(path);
           })
           .on('unlink', (path) => {
-            console.log(`File ${path} as been removed`);
             this._databaseInterface.removeFile(path);
-          })
-          .on('addDir', (path) => {
-            console.log(`Directory ${path} as been added`);
-            //_watcher.watch(path);
-            console.log("Now watching " + path);
-          })
-          .on('unlinkDir', (path) => {
-            console.log(`Directory ${path} as been removed`);
-            //_watcher.unwatch(path);
-            console.log("No longer watching " + path);
           });
 
       });

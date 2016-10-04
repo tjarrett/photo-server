@@ -135,6 +135,7 @@ const launchScanner = () => {
   "use strict";
 
   scanner.startMonitor();
+  scanner.startFileSystemScan();
 
 }
 

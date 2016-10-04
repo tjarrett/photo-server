@@ -1,5 +1,7 @@
 const path = require('path');
 const vpconfig = require(path.normalize(path.join(__dirname, "../", "lib", "config.js")));
+const exif = require('fast-exif');
+const deasync = require('deasync');
 
 class AbstractDatabaseInterface {
   constructor(database) {
@@ -15,6 +17,25 @@ class AbstractDatabaseInterface {
 
   addFileSync(path) {
     console.log("Adding " + path + " to the database");
+    let done = false;
+    let exifData = null;
+
+    exif.read(path).then((data) => {
+      done = true;
+      exifData = data;
+
+    }).catch((error) => {
+      done = true;
+
+    });
+
+    deasync.loopWhile(() => {
+      return !done;
+    });
+
+    console.log(exifData);
+
+
   }
 
   removeFile(path) {
@@ -41,6 +62,10 @@ class AbstractDatabaseInterface {
       }
     }
     return false;
+  }
+
+  isMovie(path) {
+
   }
 
 }
