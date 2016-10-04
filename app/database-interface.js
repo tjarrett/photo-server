@@ -1,6 +1,5 @@
-const APP_BASE_PATH = global.APP_BASE_PATH;
 const path = require('path');
-const vpconfig = require(path.join(APP_BASE_PATH, 'lib', 'config.js'));
+const vpconfig = require(path.normalize(path.join(__dirname, "../", "lib", "config.js")));
 
 class AbstractDatabaseInterface {
   constructor(database) {
@@ -195,59 +194,110 @@ class DatabaseInterfaceThreads extends AbstractDatabaseInterface {
   constructor(database) {
     super(database);
 
-    console.log("IN DatabaseInterfaceThreads constructor");
+    this.threads = require('threads');
+    this.config = this.threads.config;
+    this.spawn = this.threads.spawn;
+    this.pool = new (this.threads.Pool)(1);
 
-    try {
-
-
-    console.log("Setting up thread pool");
-    this.pool = new (require('threads').Pool)();
-    this.pool.run(function(input, done) {
-      try {
-
-
-      //Setup pouch d
-        const PouchDB = require('pouchdb');
-      const db = new PouchDB('http://localhost:5984/viapx-photos.db');
-      //const remote = new PouchDB(__dirname + '/viapx-photos.db');
-      //db.sync(remote, {live: true});
-
-      let dbi = new databaseInterface.DatabaseInterfaceNodeTick(db);
-      dbi.addFileSync(input.path);
-
-      } catch (e) {
-        console.log(e);
+    this.config.set({
+      basepath: {
+        node: __dirname + "/../"
       }
-
-
-
-    }, {
-      "PouchDB": "pouchdb",
-      "vpconfig": path.join(APP_BASE_PATH, 'lib', 'config.js'),
-      "databaseInterface": path.resolve(vpconfig.get('databaseInterfaceSourcePath'))
     });
 
-    console.log("Try to send the database across");
-    this.pool.send({path: "/var/web/apps"}).on('done', function() {
-      console.log("Back from thread");
-    });
-
-    } catch (e) {
-      console.log(e);
-    }
+    this.pool.run("app/database-interface-threads-worker.js");
 
   }
 
   addFile(path) {
-    throw "addFile should be considered abstract and should be overridden by your own method";
+    let callback = null;
+
+    if (arguments.length > 1 && typeof arguments[arguments.length - 1] == 'function') {
+      callback = arguments[arguments.length - 1];
+
+    }
+
+    let promise = this.pool
+                        .send({
+                          'action': 'add',
+                          'path': path
+                        })
+                        .promise();
+
+    if (callback != null) {
+      promise
+        .then((message) => {
+          callback(null, message);
+        })
+        .catch((error) => {
+          callback(error, null);
+        });
+
+    } else {
+      return promise;
+
+    }
+
   }
 
   removeFile(path) {
-    throw "removeFile should be considered abstract and should be overridden by your own method";
+    let callback = null;
+
+    if (arguments.length > 1 && typeof arguments[arguments.length - 1] == 'function') {
+      callback = arguments[arguments.length - 1];
+
+    }
+
+    let promise = this.pool
+      .send({
+        'action': 'remove',
+        'path': path
+      })
+      .promise();
+
+    if (callback != null) {
+      promise
+        .then((message) => {
+          callback(null, message);
+        })
+        .catch((error) => {
+          callback(error, null);
+        });
+
+    } else {
+      return promise;
+
+    }
   }
 
   updateFile(path) {
-    throw "updateFile should be considered abstract and should be overridden by your own method";
+    let callback = null;
+
+    if (arguments.length > 1 && typeof arguments[arguments.length - 1] == 'function') {
+      callback = arguments[arguments.length - 1];
+
+    }
+
+    let promise = this.pool
+      .send({
+        'action': 'update',
+        'path': path
+      })
+      .promise();
+
+    if (callback != null) {
+      promise
+        .then((message) => {
+          callback(null, message);
+        })
+        .catch((error) => {
+          callback(error, null);
+        });
+
+    } else {
+      return promise;
+
+    }
   }
 
 }
