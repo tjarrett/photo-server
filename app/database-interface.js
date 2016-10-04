@@ -1,3 +1,4 @@
+const APP_BASE_PATH = global.APP_BASE_PATH;
 const path = require('path');
 const vpconfig = require(path.join(APP_BASE_PATH, 'lib', 'config.js'));
 
@@ -190,5 +191,67 @@ class DatabaseInterfaceNodeTick extends AbstractDatabaseInterface {
 
 }
 
+class DatabaseInterfaceThreads extends AbstractDatabaseInterface {
+  constructor(database) {
+    super(database);
+
+    console.log("IN DatabaseInterfaceThreads constructor");
+
+    try {
+
+
+    console.log("Setting up thread pool");
+    this.pool = new (require('threads').Pool)();
+    this.pool.run(function(input, done) {
+      try {
+
+
+      //Setup pouch d
+        const PouchDB = require('pouchdb');
+      const db = new PouchDB('http://localhost:5984/viapx-photos.db');
+      //const remote = new PouchDB(__dirname + '/viapx-photos.db');
+      //db.sync(remote, {live: true});
+
+      let dbi = new databaseInterface.DatabaseInterfaceNodeTick(db);
+      dbi.addFileSync(input.path);
+
+      } catch (e) {
+        console.log(e);
+      }
+
+
+
+    }, {
+      "PouchDB": "pouchdb",
+      "vpconfig": path.join(APP_BASE_PATH, 'lib', 'config.js'),
+      "databaseInterface": path.resolve(vpconfig.get('databaseInterfaceSourcePath'))
+    });
+
+    console.log("Try to send the database across");
+    this.pool.send({path: "/var/web/apps"}).on('done', function() {
+      console.log("Back from thread");
+    });
+
+    } catch (e) {
+      console.log(e);
+    }
+
+  }
+
+  addFile(path) {
+    throw "addFile should be considered abstract and should be overridden by your own method";
+  }
+
+  removeFile(path) {
+    throw "removeFile should be considered abstract and should be overridden by your own method";
+  }
+
+  updateFile(path) {
+    throw "updateFile should be considered abstract and should be overridden by your own method";
+  }
+
+}
+
 exports.AbstractDatabaseInterface = AbstractDatabaseInterface;
 exports.DatabaseInterfaceNodeTick = DatabaseInterfaceNodeTick;
+exports.DatabaseInterfaceThreads = DatabaseInterfaceThreads;
