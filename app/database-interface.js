@@ -1,3 +1,6 @@
+const path = require('path');
+const vpconfig = require(path.join(APP_BASE_PATH, 'lib', 'config.js'));
+
 class AbstractDatabaseInterface {
   constructor(database) {
     this._database = database;
@@ -28,6 +31,16 @@ class AbstractDatabaseInterface {
 
   updateFileSync(path) {
     console.log("Updating " + path + " into the database.");
+  }
+
+  isImage(path) {
+    var regexs = vpconfig.getRegex('imageFiles');
+    for (let i=0; i<regexs.length; i++) {
+      if (path.match(regexs[i])) {
+        return true;
+      }
+    }
+    return false;
   }
 
 }
