@@ -16,7 +16,12 @@ class AbstractDatabaseInterface {
   }
 
   addFileSync(path) {
-    console.log("In addFileSync");
+    let wrapper = async function() {
+      let exifData = await exif.read(path);
+      console.log(exifData);
+    }
+
+    /*console.log("In addFileSync");
 
     let makeMeLookSync = fn => {
       let iterator = fn();
@@ -38,7 +43,7 @@ class AbstractDatabaseInterface {
       } catch (err) {
         console.log(err.message);
       }
-    });
+    });*/
 
 
 
