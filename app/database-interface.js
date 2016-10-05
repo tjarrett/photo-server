@@ -16,6 +16,33 @@ class AbstractDatabaseInterface {
   }
 
   addFileSync(path) {
+    console.log("In addFileSync");
+
+    let makeMeLookSync = fn => {
+      let iterator = fn();
+      let loop = result => {
+        !result.done && result.value.then(
+          res => loop(iterator.next(res)),
+          err => loop(iterator.throw(err))
+        );
+      };
+
+      loop(iterator.next());
+    };
+
+    makeMeLookSync(function* () {
+      try {
+        let exifData = yield exif.read(path);
+
+        console.log(exifData);
+      } catch (err) {
+        console.log(err.message);
+      }
+    });
+
+
+
+    /*
     console.log("Adding " + path + " to the database");
     let done = false;
     let exifData = null;
@@ -33,7 +60,7 @@ class AbstractDatabaseInterface {
       return !done;
     });
 
-    console.log(exifData);
+    console.log(exifData);*/
 
 
   }

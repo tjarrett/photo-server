@@ -31,36 +31,3 @@ module.exports = function(input, done) {
   }
 
 };
-
-/*
-let worker = function(input, done) {
-
-
-
-
-
-  try {
-    console.log('in worker thread');
-    console.log(input);
-
-    if (typeof this.dbi == 'undefined') {
-      console.log('first run');
-
-
-
-      this.vpconfig = require(input.app_base_path + '/lib/config.js');
-      this.db = new PouchDB('http://localhost:5984/viapx-photos.db');
-      this.dbi = new databaseInterface.DatabaseInterfaceNodeTick(this.db);
-
-    }
-
-
-    this.dbi.addFileSync(input.path);
-
-    done("Done! with " + input.path);
-
-  } catch (e) {
-    console.log(e);
-
-  }
-}*/
