@@ -223,7 +223,7 @@ class DatabaseInterfaceThreads extends AbstractDatabaseInterface {
     this.threads = require('threads');
     this.config = this.threads.config;
     this.spawn = this.threads.spawn;
-    this.pool = new (this.threads.Pool)(1);
+    this.pool = new (this.threads.Pool)();
 
     this.config.set({
       basepath: {
